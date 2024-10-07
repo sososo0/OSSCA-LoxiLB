@@ -161,3 +161,147 @@ responses:
     schema:
       $ref: '#/components/schemas/User'
 ```
+
+## About Swagger 
+
+Swagger is an open-source software framework supported by a large ecosystem of tools that helps developers design, build, document, and consume RESTful web services. 
+
+LoxiLB uses Swagger for creating and managing API documentation. Swagger is used to create documentation with YAML, which also facilitates server generation.
+
+Swagger can be broadly divided into **three main categories**: 
+
+#### Basic 
+
+Basic Information in Swagger:
+- **Version**: Specifies the API version.
+- **General Information**: Provides details about the API, such as its name, description, and purpose.
+- **Documentation Version**: Indicates the version of the documentation itself.
+- **Protocols**: Defines the supported communication protocols (e.g., HTTP, HTTPS).
+- **Host**: Specifies the server hosting the API (e.g., api.example.com).
+
+```
+swagger: '2.0'
+info:
+  title: Company REST API
+  description: Company REST API for Baremetal Scenarios
+  version: 0.0.1
+schemes:
+  - http
+  - https
+host: "0.0.0.0:11111"
+basePath: /company_name
+produces:
+  - application/json
+consumes:
+  - application/json
+```
+
+#### Path 
+
+In Swagger, a typical URI path includes the following components:
+- **Actual Path**: Represents the URI endpoint.
+- **Description**:: Provides a brief and detailed explanation of what the endpoint does. 
+- **Parameters**: 
+    - **Query Parameters**: For query strings (e.g., ```?paramName=value``` ). 
+    - **Body Parameters**: Data sent in the body of the request (e.g., POST/PUT requests).
+    - **Path Parameters**: Used for dynamic URI parts (e.g., ```/user/{id}``` ).
+- **Response** 
+
+```
+paths:
+  /account:
+    post:
+      summary: Create a new account
+      description: Create a new account with the specified attributes.
+      parameters:
+        - name: attr
+          in: body
+          required: true
+          description: Attributes for load balance service
+          schema:
+            $ref: '#/definitions/AccountEntry'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PostSuccess'
+```
+
+#### Definition 
+
+In Swagger, Definitions are used to describe the structure of objects, especially those that will be sent in the body of a request or received in a response.  
+
+```
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: Main error code
+      sub-code:
+        type: integer
+        format: int32
+        description: Additional sub-code for more detailed error categorization
+      message:
+        type: string
+        description: Description of the error
+      fields:
+        type: array
+        items:
+          type: string
+        description: List of fields involved in the error (if applicable)
+      details:
+        type: string
+        description: Additional information about the error
+```
+
+### Practice to create a server using Swagger
+
+1. Navigate to the directory where **swagger.yaml** is located and Run the command to generate the Server.
+
+```
+# go mod init swaggertest
+```
+
+2. To build and run Swagger-based Go server in Docker, Run the command after generating the go.mod.
+
+```
+# sudo docker run --rm -it  --user $(id -u):$(id -g) -e GOPATH=$(go env GOPATH):/go -v $HOME:$HOME -w $(pwd) quay.io/goswagger/swagger:0.30.3 generate server
+```
+
+3. After generating the Go server code with Swagger, Run the command to ensure all necessary dependencies are downloaded and included in go.mod file.
+
+```
+# go mode tidy
+```
+
+4. Run the command to generate a server using Swagger, it essentially create the "skeleton" of the API server.
+
+```
+# go build cmd/company-rest-api-server/main.go
+```
+
+<br>
+
+> While the server structure is generated, it is up to developer to fill in the logic behind the API to make it fully functional. \
+In short, the **Swagger-generated server is a starting point a functional skeleton** that needs further development to meet your application's needs.
+
+### Reference - RESTful API Design 
+
+- **Basic Design Principles**: 
+    - **Convention**: Use lowercase, hyphens(-), avoid trailing slaches, and use plural nouns.
+    - **Consistency**: Establish and follow your own consistent standards.
+    - **Simplicity**: Ensure it is easy for users to interact with the API. 
+    - **Intuitiveness**: Design the API so that users can understand it at a glance.
+
+- **Practical Options**:
+    - Use a single entity from the database schema as the foundation (e.g., User, Product, Config).
+    - Display the ID first, followed by details (e.g., ```user/detail/{ID}``` becomes ```/user/{id}/detail``` ).
+    - When details don't change, arrange endpoints from general to specific (e.g., ```/v1/config/...``` ).
+
+
+
+
+
