@@ -17,7 +17,7 @@ This repository was created for OSSCA LoxiLB mentoring training.
 
 ## Mentoring Content 
 
-1. Week 1 
+### 1. Week 1 
 
 Basic Concept 
 - What is Load Balancer?
