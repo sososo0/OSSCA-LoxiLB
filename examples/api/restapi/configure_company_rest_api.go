@@ -10,6 +10,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"swaggertest/restapi/handler"
 	"swaggertest/restapi/operations"
 )
 
@@ -42,11 +43,9 @@ func configureAPI(api *operations.CompanyRestAPIAPI) http.Handler {
 			return middleware.NotImplemented("operation operations.DeleteAccountUserID has not yet been implemented")
 		})
 	}
-	if api.GetAccountAllHandler == nil {
-		api.GetAccountAllHandler = operations.GetAccountAllHandlerFunc(func(params operations.GetAccountAllParams) middleware.Responder {
-			return middleware.NotImplemented("operation operations.GetAccountAll has not yet been implemented")
-		})
-	}
+
+	api.GetAccountAllHandler = operations.GetAccountAllHandlerFunc(handler.ConfigGetAccount)
+
 	if api.PostAccountHandler == nil {
 		api.PostAccountHandler = operations.PostAccountHandlerFunc(func(params operations.PostAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation operations.PostAccount has not yet been implemented")

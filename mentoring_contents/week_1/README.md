@@ -283,6 +283,76 @@ definitions:
 # go build cmd/company-rest-api-server/main.go
 ```
 
+5. To add business logic to the Swagger-generated server, navigate to the next files where the API endpoints are defined.
+
+> restapi/configure_company_rest_api.go
+
+
+1. An example of adding business logic to a GET API in a Swagger-generated Go server. 
+
+```
+	if api.GetAccountAllHandler == nil {
+		api.GetAccountAllHandler = operations.GetAccountAllHandlerFunc(func(params operations.GetAccountAllParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAccountAll has not yet been implemented")
+		})
+	}
+```
+
+- Inside the code, you can see the process of registering a handler.
+- The handler is designed to accept a single function. 
+    - As the logic becomes more complex, it can make the code harder to manage, so it's better to create separate handlers and add them individually.
+
+2. Create a handler folder under the restapi directory, and inside the handler folder, create a account.go file.
+
+```
+package handler
+
+import (
+	"swaggertest/models"
+	"swaggertest/restapi/operations"
+
+	"github.com/go-openapi/runtime/middleware"
+)
+
+func ConfigGetAccount(params operations.GetAccountAllParams) middleware.Responder {
+	var result []*models.AccountEntry
+	result = make([]*models.AccountEntry, 0)
+	result = append(result, &models.AccountEntry{
+		UserID:   "idid",
+		Password: "passwords",
+		Email:    "test@test.io",
+	})
+	return operations.NewGetAccountAllOK().WithPayload(&operations.GetAccountAllOKBody{Attr: result})
+}
+```
+
+- The handler includes a function that processes the request for GET/account and returns a list of AccountEntry objects. 
+- You can add logic to fetch real data.
+
+3. 
+```
+import (
+    ...
+
+	"swaggertest/restapi/handler"
+    
+    ...
+)
+
+
+func configureAPI(api *operations.CompanyRestAPIAPI) http.Handler {
+
+    ...
+
+	api.GetAccountAllHandler = operations.GetAccountAllHandlerFunc(handler.ConfigGetAccount)
+
+    ...
+}
+
+```
+
+- To complete the setup, you'll need to add the handler path in your project and then register the handler function in the ```configure_company_rest_api.go``` file.
+
 <br>
 
 > While the server structure is generated, it is up to developer to fill in the logic behind the API to make it fully functional. \
@@ -300,8 +370,4 @@ In short, the **Swagger-generated server is a starting point a functional skelet
     - Use a single entity from the database schema as the foundation (e.g., User, Product, Config).
     - Display the ID first, followed by details (e.g., ```user/detail/{ID}``` becomes ```/user/{id}/detail``` ).
     - When details don't change, arrange endpoints from general to specific (e.g., ```/v1/config/...``` ).
-
-
-
-
 
