@@ -1,0 +1,8 @@
+# Create my profile in YAML format (name - string / languages I can use - array)
+
+profile:
+  name: "Sohyun Park"
+  lang:
+    - Java
+    - Go
+    - Python 
