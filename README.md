@@ -1,4 +1,30 @@
-# ossca-example
+# OSSCA-LoxiLB
 
-안녕하세요. OSSCA LoxiLB 멘토링 교육을 위해서 만든 곳입니다.   
-현재 9/21 자 CLI 수업을 위한 자료가 example/cli에 올라온 상태입니다.
+This repository was created for OSSCA LoxiLB mentoring training.
+
+## Hands-on Environment
+
+1. OS: Ubuntu 20.04 or higher (Linux Kernel 5.15 or higher)
+2. Docker ce (latest version)
+3. Golang (version 1.22 or higher)
+4. Visual Studio Code
+
+## Preparation for the Training
+
+1. Install Docker, Git, Vim, and Golang on Ubuntu 
+2. Set up a remote connection to the Ubuntu environment using Visual Studio Code
+3. Fork the Repositories loxilb, loxicmd, and kube-loxilb from GitHub and clone the Repositories.
+
+## Mentoring Content 
+
+1. Week 1 
+
+Basic Concept 
+- What is Load Balancer?
+- About LoxiLB 
+- About REST API
+- About YAML 
+    - YAML vs. JSON 
+- About Swagger 
+- About CLI
+
