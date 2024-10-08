@@ -19,7 +19,7 @@ This repository was created for OSSCA LoxiLB mentoring training.
 
 ### 1. Week 1 
 
-Basic Concept 
+#### Basic Concept 
 - What is Load Balancer?
 - About LoxiLB 
 - About REST API
@@ -27,4 +27,7 @@ Basic Concept
     - YAML vs. JSON 
 - About Swagger 
 - About CLI
+
+
+## Contribute to LoxiLB 
 
