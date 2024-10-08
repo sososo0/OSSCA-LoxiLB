@@ -8,13 +8,20 @@ In summary, it is a device that eliminates bottlenecks in data traffic, ensuring
 
 ## About LoxiLB 
 
-LoxiLB is a SW Load Balancer. 
+LoxiLB is a SW Load Balancer with three planes.
 
-3가지 plane이 있다. 
+- **Management plane** : 
+    - **loxicmd**: Command-line tool to manage LoxiLB.
+    - **kube-loxilb**: Kubernetes integration tool for managing LoxiLB within Kubernetes environments.
 
-- Management plane : command를 날릴 수 있는 loxicmd, 쿠버네티스 환경에서 manage할 수 있는 곳 
-- Control plane : 
-- Data plane : 
+- **Control plane** : 
+    - **API server**: Manages interactions and communications between LoxiLB components and external systems. 
+    - **LoxiNLP**: A module for network logic processing.
+    - **goBGP**: A BGP (Border Gateway Protocol) implementation in Go used for dynamic routing.
+    - **netlink**: A communication protocol between the kernel and userspace, used to configure network interfaces, IP addresses, routes, etc. 
+
+- **Data plane** : 
+    - **eBPF**: A high-performance in-kernel technology that enables efficient packet processing and forwarding. 
 
 ## About REST API 
 
@@ -24,7 +31,7 @@ Simply put, it refers to performing CRUD operations (Create, Read, Update, Delet
 
 ## About YAML 
 
-API를 개발하기 위해서 Swagger를 사용하는데 Swagger를 사용하기 위해서 YAML로 Swagger에 대한 포멧을 맞춰놓고 껍데기 서버를 만들고 로직을 넣는다. 
+To develop APIs using Swagger, you first define the Swagger specificationin YAML format to structure the API. Then, you generate a skeleton server based on that specification and proceed to add your business logic into the generated code. 
 
 YAML is a human-readable data serialization format, inspired by concepts from email formats defined in XML, C, Python, Perl, and RFC2822. 
 
@@ -59,8 +66,7 @@ YAML is a human-readable data serialization format, inspired by concepts from em
 }
 ```
 
-- JSON은 프로그래밍 할 때 컴퓨터가 읽기는 쉽지만, 사람이 읽기에는 불편하다.
-
+- JSON is easy for computers to read during programming but can inconvenient for humans to read.
 
 <br>
 
@@ -79,8 +85,8 @@ spec:
     - containerPort: 80
 ```
 
-- 위의 JSON의 단점을 보완하기 위해 나온 것이 YAML이다. 
-- 크게 3가지로 나뉜다. 
+- YAML was introduced to address the readability issues of JSON.
+- It mainly divided into three parts.
 
 ##### Type 1. Map 
 
@@ -371,3 +377,179 @@ In short, the **Swagger-generated server is a starting point a functional skelet
     - Display the ID first, followed by details (e.g., ```user/detail/{ID}``` becomes ```/user/{id}/detail``` ).
     - When details don't change, arrange endpoints from general to specific (e.g., ```/v1/config/...``` ).
 
+## About CLI 
+
+The command-line interface (CLI), also known as a command interface, refers to how users interact with a computer by typing text-based commands through a virtual terminal or terminal.
+
+#### Command Shell vs. Prompt Shell
+
+- **Command Shell**: Modern and user-friendly but often associated with lower security. 
+- **Prompty Shell**: More traditional and older, but generally offers higher security. 
+
+### CLI Design 
+
+```
+# prgramName (command) (condition) (option)
+```
+
+- command : (CRUD operations)
+- condition : (Name of the REST API)
+- option : (parameters, body, etc., in the REST API)
+
+**Example.**
+
+```
+loxicmd get lb -o wide 
+```
+
+```
+kubectl get pod -o wide
+```
+
+#### Basic Design Principles 
+
+1. **Consistency**: Maintain a clear and consistent standard for commands (e.g., add, create).
+2. **Simplicity**: Ensure the commands are easy for users to understand and use.
+3. **Intuitiveness**: Make the commands intuitive so users can understand them easily (e.g., loxicmd get lb).
+
+#### Help Design (-h, --help)
+
+- **Examples**: Providing examples is crucial, especially for actions like adding or deleting resources.
+- **Description**: If the design is intuitive, explanations can be brief and still easily understood. 
+
+### About Cobra 
+
+Cobra is a library that provides a simple interface for creating powerful, modern CLI applications, similar to tools like Git and Go.
+
+- A library for building CLI applications in Golang.
+- Chosen for its consistency, as it is also used by Kubernetes. 
+
+### Command Code Structure Analysis 
+
+This structure clearly organizes command definites and actions, making it easier to maintain and expand the CLI functionality.  
+
+```
+├── cmd
+│   ├── root.go        # Defines main actions (get, create, delete)
+│   ├── create         # Directory for the create command
+│   ├── delete         # Directory for the delete command
+│   └── get
+│       └── get.go     # Defines the specifics of the get command (e.g., LB, account)
+└── main.go            # Main entry point for the program
+```
+
+- cmd : This directory contains the code related to the design and structure of commands. 
+    - cmd/root.go: This file defines the primary actions (e.g., get, create, delete) for the CLI. 
+    - cmd/get/get.go: This file defines the details of the get command (e.g., specifying options like load balancers(LB), accounts, etc.). 
+
+#### CLI Design Practice 
+
+Design a CLI for creating routes using the ```POST /config/route``` API, which accepts a JSON payload like the following: 
+
+```
+{
+  "destinationIPNet": "DstValue",
+  "gateway": "GWValue",
+  "protocol": "PROTO"
+}
+```
+
+**Example**:
+
+To create a new route using this API, the corresponding CLI command would be structured as:
+
+```
+loxicmd create route DstValue GWValue --protocol=PROTO
+```
+
+- **loxicmd**: The name of the CLI tool.
+- **create**: The action to create a new route (similar to a POST request).
+- **route**: The resource you are managing (in this case, the route).
+- **DstValue**: The destination IP network (destinationIPNet).
+- **GWValue**: The gateway (gateway).
+- **--protocol=PROTO**: The optional protocol parameter (protocol), passed as a flag.
+
+> This design makes it simple, intuitive, and easy to understand, closely matching the structure of the API request while offering a user-friendly interface for interacting with the system.
+
+<br>
+
+**Example. (examples/cli/cmd/root.go)**
+
+```
+var (
+	rootCmd = &cobra.Command{
+		Use:   "cobra-cli",
+		Short: "A generator for Cobra based Applications",
+		Long: `Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	}
+)
+```
+
+In a basic Cobra-based CLI application, commands like the root command typically include the following fields. 
+
+- **Use**: This defines how the command is used. It's essentially the command name and any arguments or subcommands that might be used.
+    - ```"cobra-cli"``` in the code means the root command will be called **cobra-cli** in the CLI.
+- **Short**: A brief description of what the command does. This is typically shown when a user runs ```--help``` or needs a quick overview.
+    - "A generator for Cobra based Applications" gives a concise description.
+- **Long**: A more detailed explanation of the command and its purpose. It often includes more context about how the command works and what it can be used for.
+    - This is the detailed description that explains Cobra's purpose and how the CLI application works. In this case, it describes that Cobra is a CLI library for Go and that this tool helps generate the necessary files to quickly create a Cobra application.
+
+**Example. (examples/cli/cmd/get/get.go)**
+
+The additional part of the command structure is the RUN function, where the actual logic to be executed when the command is run is added. This is where you implement the core functionality of the command, such as processing inputs, performing actions, and interacting with APIs, or other resources. 
+
+```
+func GetCmd(restOptions *api.RESTOptions) *cobra.Command {
+	//func GetCmd() *cobra.Command {
+	var getCmd = &cobra.Command{
+		Use:   "get",
+		Short: "get a Load balance features in the LoxiLB.",
+		Long: `get a Load balance features in the LoxiLB.
+Create - Service type external load-balancer, Vlan, Vxlan, Qos Policies, 
+	 Endpoint client,FDB, IPaddress, Neighbor, Route,Firewall, Mirror, Session, UlCl
+`,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("get called!\n", args)
+		},
+	}
+
+	getCmd.AddCommand(NewGetAccountCmd(restOptions))
+	return getCmd
+    }
+}
+```
+
+- This is where the actual logic of the command will be placed. 
+    - In the Run section, you can add additional logic like:
+    - **Making API calls**: You coud use restOptions to make REST API requests and fetch data.
+    - **Error handling**: Catch errors from the API or any other part of your code.
+    - **Printing detailed output**: After fetching the data, you can format and print it.
+- **AddCommand**: Add subcommands for specific resources (e.g., accounts)
+
+### Command and API Integration Structure 
+
+```
+├── cmd
+│   ├── root.go                # Defines main command actions (create, delete, get)
+│   ├── create                 # Folder for 'create' command logic
+│   ├── delete                 # Folder for 'delete' command logic
+│   └── get                    # Folder for 'get' command logic
+│       └── get_account.go     # Command to handle 'get account' actions
+├── api
+│   ├── common.go              # Handles common logic to call APIs from commands
+│   ├── client.go              # Defines specific API client logic
+│   ├── rest.go                # Core logic for making CRUD REST API calls
+│   └── account.go             # Handles API calls related to 'account'
+└── main.go                    # Entry point of the program
+```
+
+The cmd and api directories are structured to organize how commands interact with APIs. 
+
+- **cmd**: Contains command-related logic
+- **api**: Handles REST API calls.
+    - **api/rest.go**: Manages the general structure and flow of CRUD REST API calls. It defines how the requests are formed, sent, and how responses are handled.
+    - **api/common.go**: Contains helper functions that abstract REST API calls so that they can easily be invoked from commands.
+    - **api/client.go**: Defines the logic for interacting with specific APIs. It provides functions that allow various API clients to make request and receive responses. 
+    - **api/account.go**: The actual code that interacts with the Account-related APIs. It defines the REST calls needed to get, create, update, or delete an account. 
