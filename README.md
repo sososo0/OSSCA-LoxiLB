@@ -28,6 +28,19 @@ This repository was created for OSSCA LoxiLB mentoring training.
 - About Swagger 
 - About CLI
 
+### 2. Week 2 
+
+#### LoxiLB on GitHub 
+- Basic Features of a Load Balancer 
+    - NAT (Network Address Translation)
+    - Load Balancing Algorithms 
+- Utilizing GitHub in LoxiLB
+    - GitHub Actions
+    - About CICD 
+    - Packages 
+    - GitHub Pages 
+- LoxiLB Code Analysis
+- About eBPF
 
 ## Contribute to LoxiLB 
 
