@@ -68,8 +68,6 @@ YAML is a human-readable data serialization format, inspired by concepts from em
 
 - JSON is easy for computers to read during programming but can inconvenient for humans to read.
 
-<br>
-
 #### YAML 
 
 ```
@@ -122,25 +120,25 @@ apiVersion: v1
           - value2 
         ```
     
-**Case 1.**
+    **Case 1.**
 
-When an array contains maps as values: Example.
-```
-key: 
-  - value1
-  - key2: value2 
-```
+    When an array contains maps as values: Example.
+    ```
+    key: 
+    - value1
+    - key2: value2 
+    ```
 
-**Case 2.**
+    **Case 2.**
 
-If the second value is not prefixed with a hyphen(-), it's treated as part of the previous value: Example.
-```
-key: 
-  - value1
-    value2
-```
+    If the second value is not prefixed with a hyphen(-), it's treated as part of the previous value: Example.
+    ```
+    key: 
+    - value1
+        value2
+    ```
 
-- Equivalent to : ```{"key": ["value1 value2"]}```
+    - Equivalent to : ```{"key": ["value1 value2"]}```
 
 ##### Type 3. ref 
 
